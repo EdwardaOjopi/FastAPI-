@@ -1,0 +1,29 @@
+name: fastapi
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  fastapi:
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - uses: actions/checkout@3.3.0 
+        
+      - name: Docker Login
+        uses: docker/login-action@v3.3.0
+        with:
+          username: ${{ secrets.USER }}
+          password: ${{ secrets.PASSWD }}
+
+      - name: Build and push Docker images
+        uses: docker/build-push-action@v6.7.0
+        with:
+          context: .
+          file: .
+          push: true
+          tags: |
+            edwardaojopi/minha_api:v1
+            edwardaojopi/minha_api:latest
