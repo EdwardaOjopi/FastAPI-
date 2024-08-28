@@ -10,18 +10,15 @@ on:
 jobs:
   fastapi:
     runs-on: ubuntu-latest
-  sonarcloud:
-    runs-on: ubuntu-latest
     
     steps:
     
-      - name: SonarCloud
-      - uses: actions/checkout@v3
           
       - name: Checkout código
       - uses: actions/checkout@v4.1.7
         with:
-                fetch-depth: 0 
+          fetch-depth: 0 
+          
       - name: Docker Login
         uses: docker/login-action@v3.3.0
         with:
@@ -31,7 +28,7 @@ jobs:
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@v1.6
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
+          GITHUB_TOKEN: ${{ secrets.GB_TOKEN }}  # Needed to get PR information, if any
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           
       - name: Build and push Docker images
