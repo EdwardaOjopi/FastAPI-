@@ -17,14 +17,33 @@ jobs:
         with:
           username: ${{secrets.USER}}
           password: ${{secrets.PASSWD}}
-          
-      - name: Official SonarQube Scan
-        uses: SonarSource/sonarqube-scan-action@v2.3.0
-        with:
-          projectBaseDir: .
-          
-          
 
+      - name: Instalar SonarQube Scanner
+        run: |
+          wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.6.2.2472-linux.zip
+          unzip sonar-scanner-cli-4.6.2.2472-linux.zip -d $HOME
+          export PATH="$HOME/sonar-scanner-4.6.2.2472-linux/bin:$PATH"
+
+      - name: Configurar SonarQube
+        env:
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+
+      - name: Rodar Análise SonarQube
+        run: |
+          sonar-scanner \
+          -Dsonar.projectKey=nome-do-projeto \
+          -Dsonar.sources=. \
+          -Dsonar.host.url=$SONAR_HOST_URL \
+          -Dsonar.login=$SONAR_TOKEN
+
+      - name: Verificar Qualidade do Código
+        run: |
+          if [ "$(curl -s $SONAR_HOST_URL/api/qualitygates/project_status?projectKey=nome-do-projeto | jq -r .projectStatus.status)" != "OK" ]; then
+          echo "Qualidade do código não passou nos critérios definidos."
+          exit 1
+          fi
+          
       - name: Build and push Docker images
         uses: docker/build-push-action@v6.7.0
         with:
