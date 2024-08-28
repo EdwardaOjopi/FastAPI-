@@ -12,18 +12,16 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-    
-          
       - name: Checkout código
-      - uses: actions/checkout@v4.1.7
+        uses: actions/checkout@v4.1.7
         with:
           fetch-depth: 0 
           
       - name: Docker Login
         uses: docker/login-action@v3.3.0
         with:
-          username: ${{secrets.USER}}
-          password: ${{secrets.PASSWD}}
+          username: ${{ secrets.USER }}
+          password: ${{ secrets.PASSWD }}
                   
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@v1.6
@@ -35,7 +33,7 @@ jobs:
         uses: docker/build-push-action@v6.7.0
         with:
           context: .
-          push: true
+          push: false
           tags: |
             edwardaojopi/minha-api-fastapi-1:v1
             edwardaojopi/minha-api-fastapi-1:latest
@@ -58,4 +56,4 @@ jobs:
 
       - name: Push da Imagem (se a verificação passar)
         if: success()
-        run: docker push nome-da-imagem
+        run: docker push edwardaojopi/minha-api-fastapi-1:v1
