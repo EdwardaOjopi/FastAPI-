@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-
+      - name: Checkout código
       - uses: actions/checkout@v4.1.7
         
       - name: Docker Login
@@ -21,27 +21,27 @@ jobs:
       - name: Instalar SonarQube Scanner
         run: |
           wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.6.2.2472-linux.zip
-          unzip sonar-scanner-cli-4.6.2.2472-linux.zip -d $HOME
-          export PATH="$HOME/sonar-scanner-4.6.2.2472-linux/bin:$PATH"
+            unzip sonar-scanner-cli-4.6.2.2472-linux.zip -d $HOME
+              export PATH="$HOME/sonar-scanner-4.6.2.2472-linux/bin:$PATH"
 
       - name: Configurar SonarQube
         env:
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
 
       - name: Rodar Análise SonarQube
         run: |
           sonar-scanner \
-          -Dsonar.projectKey=nome-do-projeto \
-          -Dsonar.sources=. \
-          -Dsonar.host.url=$SONAR_HOST_URL \
-          -Dsonar.login=$SONAR_TOKEN
+              -Dsonar.projectKey=nome-do-projeto \
+              -Dsonar.sources=. \
+              -Dsonar.host.url=$SONAR_HOST_URL \
+              -Dsonar.login=$SONAR_TOKEN
 
       - name: Verificar Qualidade do Código
         run: |
           if [ "$(curl -s $SONAR_HOST_URL/api/qualitygates/project_status?projectKey=nome-do-projeto | jq -r .projectStatus.status)" != "OK" ]; then
-          echo "Qualidade do código não passou nos critérios definidos."
-          exit 1
+            echo "Qualidade do código não passou nos critérios definidos."
+              exit 1
           fi
           
       - name: Build and push Docker images
