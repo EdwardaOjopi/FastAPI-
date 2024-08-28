@@ -30,16 +30,16 @@ jobs:
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
         run: |
           sonar-scanner \
-              -Dsonar.projectKey=nome-do-projeto \
-              -Dsonar.sources=. \
-              -Dsonar.host.url=$SONAR_HOST_URL \
-              -Dsonar.login=$SONAR_TOKEN
+            -Dsonar.projectKey=nome-do-projeto \
+            -Dsonar.sources=. \
+            -Dsonar.host.url=$SONAR_HOST_URL \
+            -Dsonar.login=$SONAR_TOKEN
 
       - name: Verificar Qualidade do Código
         run: |
           if [ "$(curl -s $SONAR_HOST_URL/api/qualitygates/project_status?projectKey=nome-do-projeto | jq -r .projectStatus.status)" != "OK" ]; then
             echo "Qualidade do código não passou nos critérios definidos."
-              exit 1
+            exit 1
           fi
           
       - name: Build and push Docker images
