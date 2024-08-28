@@ -10,57 +10,55 @@ on:
 jobs:
   fastapi:
     runs-on: ubuntu-latest
-
+  sonarcloud:
+    runs-on: ubuntu-latest
+    
     steps:
     
+      - name: SonarCloud
+      - uses: actions/checkout@v3
+          
       - name: Checkout código
       - uses: actions/checkout@v4.1.7
-        
+        with:
+                fetch-depth: 0 
       - name: Docker Login
         uses: docker/login-action@v3.3.0
         with:
           username: ${{secrets.USER}}
           password: ${{secrets.PASSWD}}
- 
-
-  sonarcloud:
-            name: SonarCloud
-            runs-on: ubuntu-latest
-            steps:
-              - uses: actions/checkout@v3
-                with:
-                  fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
-              - name: SonarCloud Scan
-                uses: SonarSource/sonarcloud-github-action@master
-                env:
-                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
-                  SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+                  
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@v1.6
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           
-              - name: Build and push Docker images
-                uses: docker/build-push-action@v6.7.0
-                with:
-                  context: .
-                  push: true
-                  tags: |
-                    edwardaojopi/minha-api-fastapi-1:v1
-                    edwardaojopi/minha-api-fastapi-1:latest
+      - name: Build and push Docker images
+        uses: docker/build-push-action@v6.7.0
+        with:
+          context: .
+          push: true
+          tags: |
+            edwardaojopi/minha-api-fastapi-1:v1
+            edwardaojopi/minha-api-fastapi-1:latest
 
-              - name: Instalar Trivy
-                run: |
-                  sudo apt-get update && sudo apt-get install wget -y
-                  wget https://github.com/aquasecurity/trivy/releases/download/v0.34.0/trivy_0.34.0_Linux-64bit.deb
-                  sudo dpkg -i trivy_0.34.0_Linux-64bit.deb
+      - name: Instalar Trivy
+        run: |
+          sudo apt-get update && sudo apt-get install wget -y
+          wget https://github.com/aquasecurity/trivy/releases/download/v0.34.0/trivy_0.34.0_Linux-64bit.deb
+          sudo dpkg -i trivy_0.34.0_Linux-64bit.deb
 
-              - name: Escanear a Imagem com Trivy
-                run: |
-                  trivy image --severity HIGH,CRITICAL nome-da-imagem
+      - name: Escanear a Imagem com Trivy
+        run: |
+          trivy image --severity HIGH,CRITICAL nome-da-imagem
         
-              - name: Processar Resultados
-                if: failure()
-                run: |
-                  echo "Vulnerabilidades encontradas. Revisar os resultados do Trivy."
-                  exit 1
+      - name: Processar Resultados
+        if: failure()
+        run: |
+          echo "Vulnerabilidades encontradas. Revisar os resultados do Trivy."
+          exit 1
 
-              - name: Push da Imagem (se a verificação passar)
-                if: success()
-                run: docker push nome-da-imagem
+      - name: Push da Imagem (se a verificação passar)
+        if: success()
+        run: docker push nome-da-imagem
