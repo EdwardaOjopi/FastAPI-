@@ -24,5 +24,5 @@ jobs:
           context: .
           push: true
           tags: |
-            edwardaojopi/minha_api:v1
-            edwardaojopi/minha_api:latest
+            edwardaojopi/minha-api-fastapi-1:v1
+            edwardaojopi/minha-api-fastapi-1:latest
