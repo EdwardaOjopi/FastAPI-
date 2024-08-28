@@ -1,4 +1,4 @@
-name: fastapi
+name: CI
 
 on:
   push:
@@ -22,7 +22,6 @@ jobs:
         uses: docker/build-push-action@v6.7.0
         with:
           context: .
-          file: .
           push: true
           tags: |
             edwardaojopi/minha_api:v1
